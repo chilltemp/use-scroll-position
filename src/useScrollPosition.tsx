@@ -13,12 +13,12 @@ interface IScrollProps {
   currPos: IPosition;
 }
 
-type ElementRef = MutableRefObject<HTMLElement | null | undefined>;
+type ElementRef = MutableRefObject<Element | null | undefined>;
 
 const isBrowser = typeof window !== `undefined`;
 const zeroPosition = { x: 0, y: 0 };
 
-const getClientRect = (element?: HTMLElement | null) => element?.getBoundingClientRect();
+const getClientRect = (element?: Element | null) => element?.getBoundingClientRect();
 
 const getScrollPosition = ({
   element,
