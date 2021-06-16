@@ -4,6 +4,8 @@ import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 interface IPosition {
   x: number;
   y: number;
+  containerRect?: DOMRect;
+  elementRect?: DOMRect;
 }
 
 interface IScrollProps {
@@ -11,12 +13,12 @@ interface IScrollProps {
   currPos: IPosition;
 }
 
-type ElementRef = MutableRefObject<HTMLElement | undefined>;
+type ElementRef = MutableRefObject<HTMLElement | null | undefined>;
 
 const isBrowser = typeof window !== `undefined`;
 const zeroPosition = { x: 0, y: 0 };
 
-const getClientRect = (element?: HTMLElement) => element?.getBoundingClientRect();
+const getClientRect = (element?: HTMLElement | null) => element?.getBoundingClientRect();
 
 const getScrollPosition = ({
   element,
@@ -26,7 +28,7 @@ const getScrollPosition = ({
   element?: ElementRef;
   boundingElement?: ElementRef;
   useWindow?: boolean;
-}) => {
+}): IPosition => {
   if (!isBrowser) {
     return zeroPosition;
   }
@@ -46,8 +48,14 @@ const getScrollPosition = ({
     ? {
         x: (containerPosition.x || 0) - (targetPosition.x || 0),
         y: (containerPosition.y || 0) - (targetPosition.y || 0),
+        containerRect: containerPosition,
+        elementRect: targetPosition,
       }
-    : { x: targetPosition.left, y: targetPosition.top };
+    : {
+        x: targetPosition.left,
+        y: targetPosition.top,
+        elementRect: targetPosition,
+      };
 };
 
 export const useScrollPosition = (
@@ -77,7 +85,7 @@ export const useScrollPosition = (
     const handleScroll = () => {
       if (wait) {
         if (throttleTimeout === null) {
-					throttleTimeout = window.setTimeout(callBack, wait);
+          throttleTimeout = window.setTimeout(callBack, wait);
         }
       } else {
         callBack();
